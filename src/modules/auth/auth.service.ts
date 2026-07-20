@@ -47,8 +47,6 @@ export class AuthService {
   async register(dto: RegisterDto): Promise<{ message: string }> {
     const existing = await this.usersService.findByEmail(dto.email);
     if (existing) {
-      // Same generic error whether it's a taken email or an OAuth-only
-      // account, to avoid leaking which emails are registered.
       throw new ConflictException("Bu email allaqachon ro'yxatdan o'tgan");
     }
 
@@ -73,8 +71,6 @@ export class AuthService {
   async validateLocalUser(email: string, password: string): Promise<User> {
     const user = await this.usersService.findByEmail(email);
 
-    // Always run bcrypt.compare even when user is missing/passwordless,
-    // to keep response timing constant and avoid user-enumeration via timing.
     const hash = user?.password ?? '$2b$12$invalidsaltinvalidsaltinvalidsal';
     const isMatch = await bcrypt.compare(password, hash);
 
@@ -98,12 +94,6 @@ export class AuthService {
     return this.issueTokenPair(user, context);
   }
 
-  /**
-   * Rotates the refresh token: validates the presented token against Redis
-   * (fast revocation check) and its stored hash in Postgres, revokes it,
-   * and issues a brand-new pair. This limits the blast radius if a refresh
-   * token is ever stolen (reuse detection below).
-   */
   async refreshTokens(
     rawRefreshToken: string,
     context: RequestContext,
@@ -120,8 +110,6 @@ export class AuthService {
       );
     }
 
-    // Fast path: Redis revocation check (covers both single-token and
-    // whole-user revocation) before touching Postgres.
     const isRevoked = await this.redisService.isRefreshTokenRevoked(
       payload.tokenId,
     );
@@ -145,8 +133,6 @@ export class AuthService {
       stored.revoked ||
       (userRevokedAt !== null && stored.createdAt.getTime() < userRevokedAt)
     ) {
-      // Reuse of a revoked token = possible theft. Revoke all sessions
-      // for this user as a precaution.
       await this.handleTokenReuse(payload.sub);
       throw new UnauthorizedException(
         'Xavfsizlik sababli barcha sessiyalar tugatildi. Qayta kiring.',
@@ -167,8 +153,6 @@ export class AuthService {
       throw new UnauthorizedException('Foydalanuvchi topilmadi');
     }
 
-    // Revoke old, issue new (rotation) — Postgres for audit trail, Redis
-    // for immediate effect on the fast path above.
     const remainingTtlSeconds = Math.max(
       1,
       Math.floor((stored.expiresAt.getTime() - Date.now()) / 1000),
@@ -230,7 +214,6 @@ export class AuthService {
   async forgotPassword(email: string): Promise<{ message: string }> {
     const user = await this.usersService.findByEmail(email);
 
-    // Always return the same message — don't reveal whether the email exists.
     const genericResponse = {
       message:
         "Agar bu email ro'yxatdan o'tgan bo'lsa, parolni tiklash havolasi yuborildi",

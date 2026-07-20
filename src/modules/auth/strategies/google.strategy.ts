@@ -36,8 +36,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       );
 
       if (!user) {
-        // If an email/password account already exists with this email,
-        // link the Google id instead of creating a duplicate account.
         const existingByEmail = await this.usersService.findByEmail(email);
 
         if (existingByEmail) {

@@ -46,7 +46,6 @@ import { MailModule } from '../mail/mail.module';
     RefreshTokenRepository,
     EmailVerificationRepository,
     PasswordResetRepository,
-    // Protects every route by default; use @Public() to opt out.
     { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
   exports: [AuthService],

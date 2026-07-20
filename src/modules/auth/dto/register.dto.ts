@@ -13,7 +13,7 @@ export class RegisterDto {
 
   @IsString()
   @MinLength(8, { message: "Parol kamida 8 belgidan iborat bo'lishi kerak" })
-  @MaxLength(72, { message: 'Parol 72 belgidan oshmasligi kerak' }) // bcrypt limit
+  @MaxLength(72, { message: 'Parol 72 belgidan oshmasligi kerak' })
   @Matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
     message:
       "Parolda kamida 1 ta katta harf, 1 ta kichik harf va 1 ta raqam bo'lishi kerak",

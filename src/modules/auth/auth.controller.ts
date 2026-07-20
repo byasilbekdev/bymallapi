@@ -57,7 +57,6 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    // LocalAuthGuard has already validated credentials and attached `user`.
     const user = req.user as User;
     const tokens = await this.authService.loginWithOAuthUser(
       user,
@@ -121,8 +120,6 @@ export class AuthController {
     const user = await this.usersService.findById(currentUser.id);
     return { user: user ? new UserResponseDto(user) : null };
   }
-
-  // ---------- Google OAuth ----------
 
   @Public()
   @UseGuards(GoogleAuthGuard)

@@ -7,12 +7,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
-/**
- * Thin wrapper around ioredis, used as the fast revocation/session store
- * for refresh tokens. Postgres remains the source of truth (audit trail,
- * device list); Redis exists purely to make "is this token revoked?"
- * checks O(1) without hitting Postgres on every refresh call.
- */
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RedisService.name);
@@ -42,7 +36,6 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     await this.client.quit();
   }
 
-  /** Mark a refresh token id as revoked, expiring automatically at token TTL. */
   async revokeRefreshToken(tokenId: string, ttlSeconds: number): Promise<void> {
     await this.client.set(this.revokedKey(tokenId), '1', 'EX', ttlSeconds);
   }
@@ -52,7 +45,6 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     return value === '1';
   }
 
-  /** Revoke every active refresh token for a user (e.g. on password reset / theft detection). */
   async revokeAllUserSessions(
     userId: string,
     ttlSeconds: number,
@@ -65,7 +57,6 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     );
   }
 
-  /** Returns the epoch ms after which all of a user's tokens are considered invalid, if set. */
   async getUserRevocationTimestamp(userId: string): Promise<number | null> {
     const value = await this.client.get(this.userRevokedKey(userId));
     return value ? Number(value) : null;
