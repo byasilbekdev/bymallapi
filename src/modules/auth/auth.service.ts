@@ -26,8 +26,8 @@ import {
 } from './auth.types';
 
 const BCRYPT_SALT_ROUNDS = 12;
-const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000; // 24h
-const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000; // 1h
+const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
+const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000;
 
 @Injectable()
 export class AuthService {
@@ -252,8 +252,6 @@ export class AuthService {
     await this.usersService.updatePassword(record.userId, passwordHash);
     await this.passwordResetRepository.markUsed(record.id);
 
-    // Invalidate all existing sessions after password change —
-    // Redis for immediate effect, Postgres for audit trail.
     const refreshTtlSeconds = Math.floor(
       this.parseExpiryToMs(
         this.config.get<string>('jwt.refreshExpiresIn') ?? '7d',
@@ -266,8 +264,6 @@ export class AuthService {
 
     return { message: 'Parol muvaffaqiyatli yangilandi' };
   }
-
-  // ---------- private helpers ----------
 
   private async handleTokenReuse(userId: string): Promise<void> {
     const refreshTtlSeconds = Math.floor(
@@ -300,8 +296,6 @@ export class AuthService {
       ) as SignOptions['expiresIn'],
     });
 
-    // Create the refresh-token DB row first so we have an id to embed
-    // in the JWT (needed for rotation/revocation lookups).
     const refreshTtlMs = this.parseExpiryToMs(
       this.config.get<string>('jwt.refreshExpiresIn') ?? '7d',
     );
@@ -327,7 +321,6 @@ export class AuthService {
       ) as SignOptions['expiresIn'],
     });
 
-    // Now store the real hash of the issued token.
     await this.refreshTokenRepository.updateTokenHash(
       tokenRecord.id,
       this.hashToken(refreshToken),
@@ -352,7 +345,7 @@ export class AuthService {
 
   private parseExpiryToMs(expiry: string): number {
     const match = /^(\d+)([smhd])$/.exec(expiry);
-    if (!match) return 7 * 24 * 60 * 60 * 1000; // default 7d fallback
+    if (!match) return 7 * 24 * 60 * 60 * 1000;
 
     const value = Number(match[1]);
     const unit = match[2];
