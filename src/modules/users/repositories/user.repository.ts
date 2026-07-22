@@ -18,13 +18,6 @@ export interface CreateGoogleUserInput {
   avatarUrl?: string;
 }
 
-/**
- * Repository layer: the ONLY place in the codebase that issues Prisma
- * queries for the User model. Services depend on this abstraction rather
- * than PrismaService directly, so persistence details can change (e.g.
- * swapping Prisma for another ORM, adding caching) without touching
- * business logic in AuthService/UsersService.
- */
 @Injectable()
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -63,7 +56,7 @@ export class UserRepository {
         lastName: input.lastName,
         avatarUrl: input.avatarUrl,
         provider: AuthProvider.GOOGLE,
-        isEmailVerified: true, // Google already verified the email
+        isEmailVerified: true,
       },
     });
   }

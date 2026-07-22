@@ -13,21 +13,21 @@ async function bootstrap() {
 
   app.enableCors({
     origin: config.get<string>('app.frontendUrl'),
-    credentials: true, // required so browser sends/receives httpOnly cookies
+    credentials: true,
   });
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // strip properties not defined in DTOs
-      forbidNonWhitelisted: true, // throw if extra properties are sent
-      transform: true, // auto-transform payloads to DTO instances
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
       transformOptions: { enableImplicitConversion: true },
     }),
   );
 
   app.setGlobalPrefix('api/v1');
 
-  const port = config.get<number>('app.port') ?? 3000;
+  const port = config.get<number>('app.port') ?? 3001;
   await app.listen(port);
   logger.log(`Application running on: http://localhost:${port}/api/v1`);
 }

@@ -53,7 +53,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 
       done(null, user);
     } catch (error) {
-      done(error as Error, false);
+      done(error, false);
     }
   }
 }

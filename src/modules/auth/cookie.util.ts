@@ -11,20 +11,20 @@ export function setAuthCookies(
 
   const baseOptions = {
     httpOnly: true,
-    secure: isProd, // requires HTTPS in production
-    sameSite: 'lax' as const, // 'strict' breaks OAuth redirect flows
+    secure: isProd,
+    sameSite: 'lax' as const,
     path: '/',
   };
 
   res.cookie(ACCESS_TOKEN_COOKIE, tokens.accessToken, {
     ...baseOptions,
-    maxAge: 15 * 60 * 1000, // 15 minutes, keep in sync with JWT_ACCESS_EXPIRES_IN
+    maxAge: 15 * 60 * 1000,
   });
 
   res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
     ...baseOptions,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days, keep in sync with JWT_REFRESH_EXPIRES_IN
-    path: '/api/v1/auth', // only sent to auth endpoints, reduces exposure
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: '/api/v1/auth',
   });
 }
 

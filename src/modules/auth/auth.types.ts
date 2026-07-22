@@ -1,11 +1,11 @@
 export interface JwtAccessPayload {
-  sub: string; // userId
+  sub: string;
   email: string;
 }
 
 export interface JwtRefreshPayload {
-  sub: string; // userId
-  tokenId: string; // refresh token DB record id, used for rotation/revocation
+  sub: string;
+  tokenId: string;
 }
 
 export interface AuthTokens {

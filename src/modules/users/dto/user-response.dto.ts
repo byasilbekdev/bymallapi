@@ -1,9 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
 
-/**
- * Never return the raw User entity to the client.
- * This DTO strips password and other sensitive fields.
- */
 @Exclude()
 export class UserResponseDto {
   @Expose()

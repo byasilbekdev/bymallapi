@@ -1,25 +1,26 @@
 {
   "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
     "target": "ES2023",
-    "module": "commonjs",
-    "moduleResolution": "node",
-
+    "sourceMap": true,
     "rootDir": "./src",
     "outDir": "./dist",
-
-    "strict": true,
-
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-
-    "esModuleInterop": true,
-
-    "declaration": true,
-    "sourceMap": true,
-
     "incremental": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*.ts", "src/**/*.d.ts"]
 }
